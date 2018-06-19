@@ -1,0 +1,22 @@
+{
+  "name": "Vega Inspect",
+  "version": "0.1",
+  "description": "Extends the Developer Tools, adding a vega inspector.",
+  "manifest_version": 2,
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "permissions": [
+    "storage",
+    "declarativeContent",
+    "activeTab",
+    "http://*/*",
+    "https://*/*",
+    "file://*/*"
+	],
+  "page_action": {
+    "default_popup": "popup.html"
+  },
+  "options_page": "options.html"
+}
