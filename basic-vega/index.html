@@ -1,0 +1,34 @@
+<html>
+<head>
+  <script src="node_modules/vega/build/vega.js"></script>
+  <script>
+    var view;
+    window.view = view;
+
+    vega.loader()
+      .load('https://vega.github.io/vega/examples/bar-chart.vg.json')
+      .then(function(data) { 
+          render(JSON.parse(data));
+      });
+
+    function render(spec) {
+      view = new vega.View(vega.parse(spec))
+        .renderer('canvas')  // set renderer (canvas or svg)
+        .initialize('#container') // initialize view within parent DOM container
+        .hover()             // enable hover encode set processing
+        .run();
+    }
+  </script>
+</head>
+<body>
+  <div id="container">Vega here</div>
+  <button id="theButton">The button</button>
+  <script>
+    document.getElementById("theButton").addEventListener("click",
+    function() {
+      console.log(window.view.scenegraph().toJSON());
+      window.postMessage({ type: "FROM_PAGE", text: window.view.scenegraph().toJSON() }, "*");
+    }, false);
+  </script>
+</body>
+</html>
