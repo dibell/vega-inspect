@@ -26,7 +26,8 @@
   <script>
     document.getElementById("theButton").addEventListener("click",
     function() {
-      console.log(window.view.scenegraph().toJSON());
+      // console.log(window.view.scenegraph().toJSON());
+      console.log('posting message');
       window.postMessage({ type: "FROM_PAGE", text: window.view.scenegraph().toJSON() }, "*");
     }, false);
   </script>

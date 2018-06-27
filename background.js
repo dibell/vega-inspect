@@ -1,29 +1,31 @@
-chrome.runtime.onInstalled.addListener(function() {
-  chrome.storage.sync.set({color: '#3aa757'}, function() {
-	console.log("The color is green.");
-  });
+chrome.runtime.onConnect.addListener(function(devToolsConnection) {
+    console.log('onConnect', devToolsConnection);
 
-  chrome.declarativeContent.onPageChanged.removeRules(undefined, function() {
-    chrome.declarativeContent.onPageChanged.addRules([{
-      conditions: [
-        new chrome.declarativeContent.PageStateMatcher({
-          css: ["#container"]
-        })
-	  ],
-      actions: [
-        new chrome.declarativeContent.ShowPageAction()
-      ]
-	}]);
-  });
+    // assign the listener function to a variable so we can remove it later
+    var devToolsListener = function(message, sender, sendResponse) {
+        console.log('devToolsListener', message.scriptToInject, sender.tabId);
+        // Inject a content script into the identified tab
+        chrome.tabs.executeScript(message.tabId,
+            { file: message.scriptToInject });
+    }
 
-  chrome.runtime.onMessage.addListener(
-	function(request, sender, sendResponse) {
-	  console.log(sender.tab ?
-				  "from a content script:" + sender.tab.url :
-				  "from the extension");
-	  if (request.greeting == "hello")
-		sendResponse({farewell: "goodbye"});
-	}
-  );
+    // add the listener
+    devToolsConnection.onMessage.addListener(devToolsListener);
+
+    devToolsConnection.onDisconnect.addListener(function() {
+         console.log('onDisconnect');
+         devToolsConnection.onMessage.removeListener(devToolsListener);
+    });
+    console.log('done');
 });
 
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (!sender.tab) {
+    return;
+  }
+  console.log('onMessage', sender.tab, request.type); //request, sender, sendResponse);
+});
+
+chrome.tabs.onUpdated.addListener(function(tabId) {
+  console.log('onUpdated', tabId);
+});

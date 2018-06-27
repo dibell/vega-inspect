@@ -15,7 +15,5 @@
     "https://*/*",
     "file://*/*"
 	],
-  "page_action": {
-    "default_popup": "popup.html"
-  }
+  "devtools_page": "devtools.html"
 }
