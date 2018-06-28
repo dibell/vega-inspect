@@ -28,11 +28,7 @@
     function() {
       // console.log(window.view.scenegraph().toJSON());
       console.log('posting message');
-      window.postMessage({ type: "FROM_PAGE", text: window.view.scenegraph().toJSON() }, "*");
-      // const message = {content: 'hello from basic-vega'};
-      // chrome.runtime.sendMessage('pkogbgncpklkcicifnpmfmfgedcjpcpk', message, function(message){
-      //     console.log('basic-vega received response', message);
-      // });
+      window.postMessage({ type: "SCENEGRAPH", content: window.view.scenegraph().toJSON() }, "*");
     }, false);
   </script>
 </body>

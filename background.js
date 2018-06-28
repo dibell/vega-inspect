@@ -1,31 +1,27 @@
-chrome.extension.onConnect.addListener(function (port) {
+console.log('hello from background.js');
 
-    var extensionListener = function (message, sender, sendResponse) {
-        console.log('extensionListener', message, sender);
+let contentScriptPort;
+let panelPort;
 
-        if(message.tabId && message.content) {
+chrome.runtime.onConnect.addListener(function(portFrom) {  
+  console.log('background onConnect', portFrom.name);
 
-          // chrome.tabs.executeScript(message.tabId, {code: message.content});
-          // chrome.tabs.executeScript(message.tabId, {file: message.content});
-          // chrome.tabs.sendMessage(message.tabId, message, sendResponse);
 
-        // This accepts messages from the inspectedPage and 
-        // sends them to the panel
-        } else {
-            port.postMessage(message);
-        }
-        sendResponse(message);
-    }
-
-    // Listens to messages sent from the panel
-    chrome.extension.onMessage.addListener(extensionListener);
-
-    port.onDisconnect.addListener(function(port) {
-        chrome.extension.onMessage.removeListener(extensionListener);
+  if(portFrom.name === 'vega-contentscript') {
+    portFrom.onMessage.addListener(function(message) {
+      contentScriptPort = portFrom;
+      console.log('background got message from contentscript');
+      if (panelPort) {
+        console.log('sending on to panel');
+        panelPort.postMessage(message);
+      }
     });
-});
+  }
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    console.log('onMessage');
-    return true;
+  if(portFrom.name === 'vega-panel') {
+    panelPort = portFrom;
+    portFrom.onMessage.addListener(function(message) {
+      console.log('background got message from panel', message);
+    });
+  }
 });

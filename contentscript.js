@@ -1,19 +1,14 @@
-console.log('hello');
+console.log('hello from content script');
 
-// var port = chrome.runtime.connect('pkogbgncpklkcicifnpmfmfgedcjpcpk');
+var port = chrome.runtime.connect({name: 'vega-contentscript'});
 
 window.addEventListener("message", function(event) {
-  console.log('content script got event');
   // We only accept messages from ourselves
   if (event.source != window)
     return;
 
-  if (event.data.type && (event.data.type == "FROM_PAGE")) {
-    console.log("Content script received: " + event.data.text);
-    // port.postMessage(event.data.text);
-	chrome.runtime.sendMessage('pkogbgncpklkcicifnpmfmfgedcjpcpk',
-                               {greeting: "hello"}, function(response) {
-	  console.log(response.farewell);
-	});
+  if (event.data.type && (event.data.type == "SCENEGRAPH")) {
+    console.log("Content script received message");
+    port.postMessage({type: "SCENEGRAPH", content: event.data.content}); // send to background script
   }
 }, false);
