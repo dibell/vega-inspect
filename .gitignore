@@ -1,1 +1,4 @@
+*.swp
 basic-vega/node_modules
+node_modules
+build
