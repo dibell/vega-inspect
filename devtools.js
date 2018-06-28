@@ -8,19 +8,3 @@ chrome.devtools.panels.create("Vega",
     console.log('devtools.js panel created');
   }
 );
-
-// Create a connection to the background page
-var backgroundPageConnection = chrome.runtime.connect({
-  name: "devtools-page"
-});
-
-backgroundPageConnection.onMessage.addListener(function (message) {
-  // Handle responses from the background page, if any
-  console.log('devtools.js message', message);
-});
-
-// Relay the tab ID to the background page
-chrome.runtime.sendMessage({
-  tabId: chrome.devtools.inspectedWindow.tabId,
-  scriptToInject: "contentscript.js"
-});

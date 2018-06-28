@@ -3,6 +3,7 @@ console.log('hello');
 // var port = chrome.runtime.connect('pkogbgncpklkcicifnpmfmfgedcjpcpk');
 
 window.addEventListener("message", function(event) {
+  console.log('content script got event');
   // We only accept messages from ourselves
   if (event.source != window)
     return;
