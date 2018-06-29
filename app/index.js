@@ -24,22 +24,55 @@ class Mark extends Component {
     e.preventDefault();
   }
 
-  renderSubItems(items, index) {
+  getDisplay(item, marktype) {
+    console.log('getDisplay', marktype);
+    switch (marktype) {
+      case 'text':
+        return `(${item.x},${item.y}): ${item.text}`;
+        break;
+      case 'rule':
+        return `(${item.x},${item.y}: ${item.x2},${item.y2})`;
+        break;
+      case 'rect':
+        return `(${item.x},${item.y}: ${item.x2},${item.y2}) (${item.width}x${item.height})`;
+        break;
+      default:
+        return JSON.stringify(item);
+        // plotting symbols (symbol),
+        // general paths or polygons (path),
+        // circular arcs (arc),
+        // filled areas (area),
+        // lines (line),
+        // images (image),
+        // shape
+        // trail
+        // area
+    }
+  }
+
+  renderSubItems(items, index, marktype) {
     return (
       <div>
         {items.map((item, subIndex) =>
-          <Mark key={makeSubIndex(index, subIndex)} mark={item} index={makeSubIndex(index, subIndex)} />
+        <Mark key={makeSubIndex(index, subIndex)}
+          mark={item}
+          index={makeSubIndex(index, subIndex)}
+          parent={marktype}
+        />
         )}
       </div>
     );
   }
 
-  renderItem(mark, index) {
-    const nSubItems = mark.items ? mark.items.length : 0;
-    const display = JSON.stringify(mark);
+  renderItem(item, index, marktype) {
+    const nSubItems = item.items ? item.items.length : 0;
+    const display = this.getDisplay(item, marktype);
     return (
       <div className="mark" onClick={this.click}>
-        {index}: {display} - {nSubItems} sub item(s)
+        {index}: {display}
+        {!!nSubItems &&
+          <span>- {nSubItems} sub item(s)</span>
+        }
       </div>
     );
   }
@@ -53,7 +86,7 @@ class Mark extends Component {
         </div>
 
         {this.state.expanded && nSubItems &&
-          this.renderSubItems(mark.items, index)
+          this.renderSubItems(mark.items, index, mark.marktype)
         }
       </div>
     );
@@ -79,14 +112,14 @@ class Mark extends Component {
   }
 
   render() {
-    const { mark, index } = this.props;
+    const { mark, index, parent } = this.props;
     if (mark.marktype === 'group') {
         return this.renderGroup(mark, index);
     }
     if (mark.marktype) {
         return this.renderMark(mark, index);
     }
-    return this.renderItem(mark, index);
+    return this.renderItem(mark, index, parent);
   }
 };
 
