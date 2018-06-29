@@ -8,6 +8,7 @@ const scenegraph = require('./scenegraph.json');
 const makeSubIndex = (index, subIndex) => 
   `${index}.${subIndex}`;
 
+
 class Mark extends Component {
   constructor(props) {
     super(props);
@@ -17,37 +18,59 @@ class Mark extends Component {
     };
   }
   
-  click() {
-    console.log('click');
+  click(e) {
+    console.log('click', this);
     this.setState({ expanded: !this.state.expanded });
+    e.preventDefault();
   }
 
-  render () {
-    const { mark, index } = this.props;
+  renderSubItems(items, index) {
+    return (
+      <div>
+        {items.map((item, subIndex) =>
+          <Mark key={makeSubIndex(index, subIndex)} mark={item} index={makeSubIndex(index, subIndex)} />
+        )}
+      </div>
+    );
+  }
+
+  renderMark(mark, index) {
     const nSubItems = mark.items ? mark.items.length : 0;
     return (
       <div className="mark" onClick={this.click}>
         {index}: {mark.marktype}/{mark.role} - {nSubItems} sub item(s)
-        {this.state.expanded && mark.items &&
-          <div>
-            {mark.items.map((item, subIndex) =>
-              <Mark key={makeSubIndex(index, subIndex)} mark={item} index={index} />
-            )}
-          </div>
+      </div>
+    );
+  }
+
+  renderGroup(mark, index) {
+    const rootItem = mark.items[0];
+    const nSubItems = rootItem.items ? rootItem.items.length : 0;
+
+    return (
+      <div className="group" onClick={this.click}>
+        {index} group: {mark.name}/{mark.role}&nbsp;
+        <span>{rootItem.width}x{rootItem.height}</span>&nbsp;
+        {nSubItems} sub item(s)
+
+        {this.state.expanded && nSubItems &&
+          this.renderSubItems(rootItem.items, index)
         }
       </div>
     );
   }
+
+
+  render() {
+    const { mark, index } = this.props;
+    return mark.marktype === 'group' ? this.renderGroup(mark, index) : this.renderMark(mark, index);
+  }
 };
 
 const Scenegraph = ({scenegraph}) => {
-  const rootItem = scenegraph.items[0];
   return (
     <div id="root">
-      <div className="root">scenegraph: {scenegraph.name}/{scenegraph.role} <span>{rootItem.width}x{rootItem.height}</span></div>
-      {rootItem.items.map((item, index) =>
-        <Mark key={index} mark={item} index={index} />
-      )}
+      <Mark key={0} mark={scenegraph} index={0} />
     </div>
   )
 };
@@ -72,7 +95,6 @@ class App extends Component {
   }
 
   click() {
-    console.log('Done!');
     validate(scenegraph);
     this.setState({scenegraph});
   }
