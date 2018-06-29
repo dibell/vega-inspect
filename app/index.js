@@ -34,11 +34,27 @@ class Mark extends Component {
     );
   }
 
+  renderItem(mark, index) {
+    const nSubItems = mark.items ? mark.items.length : 0;
+    const display = JSON.stringify(mark);
+    return (
+      <div className="mark" onClick={this.click}>
+        {index}: {display} - {nSubItems} sub item(s)
+      </div>
+    );
+  }
+
   renderMark(mark, index) {
     const nSubItems = mark.items ? mark.items.length : 0;
     return (
-      <div className="mark" onClick={this.click}>
-        {index}: {mark.marktype}/{mark.role} - {nSubItems} sub item(s)
+      <div className="mark">
+        <div className="header" onClick={this.click}>
+          {index}: {mark.marktype}/{mark.role} - {nSubItems} sub item(s)
+        </div>
+
+        {this.state.expanded && nSubItems &&
+          this.renderSubItems(mark.items, index)
+        }
       </div>
     );
   }
@@ -48,10 +64,12 @@ class Mark extends Component {
     const nSubItems = rootItem.items ? rootItem.items.length : 0;
 
     return (
-      <div className="group" onClick={this.click}>
-        {index} group: {mark.name}/{mark.role}&nbsp;
-        <span>{rootItem.width}x{rootItem.height}</span>&nbsp;
-        {nSubItems} sub item(s)
+      <div className="group">
+        <div className="header" onClick={this.click}>
+          {index} group: {mark.name}/{mark.role}&nbsp;
+          {rootItem.width}x{rootItem.height}&nbsp;
+          {nSubItems} sub item(s)
+        </div>
 
         {this.state.expanded && nSubItems &&
           this.renderSubItems(rootItem.items, index)
@@ -60,10 +78,15 @@ class Mark extends Component {
     );
   }
 
-
   render() {
     const { mark, index } = this.props;
-    return mark.marktype === 'group' ? this.renderGroup(mark, index) : this.renderMark(mark, index);
+    if (mark.marktype === 'group') {
+        return this.renderGroup(mark, index);
+    }
+    if (mark.marktype) {
+        return this.renderMark(mark, index);
+    }
+    return this.renderItem(mark, index);
   }
 };
 

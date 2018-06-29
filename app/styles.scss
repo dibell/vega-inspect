@@ -10,11 +10,13 @@ html, body {
     font-weight: bold;
 }
 
-.mark {
-    padding: 3px;
-    &:hover {
-        background-color: #333;
-        cursor: pointer;
+.mark,.group {
+    padding: 10px;
+    .header {
+        &:hover {
+            background-color: #333;
+            cursor: pointer;
+        }
     }
 }
 
