@@ -10,40 +10,24 @@ module.exports = {
     publicPath: '.'
   },
   mode: 'development',
+  devtool: 'source-map',
   module: {
     rules: [
       {
         test: /\.js/,
-        include: path.resolve('./app/'),
         loader: 'babel-loader'
       },
       {
-        test: /\.s?css$/,
+        test: /\.scss$/,
         use: [
-          {loader: 'style-loader'},
-          {
-            loader: 'css-loader?importLoaders=1',
-            query: {
-              modules: true,
-              localIdentName: '[name]__[local]___[hash:base64:5]'
-            }
-          },
-          {loader: 'sass-loader'},
-          {
-            loader: 'postcss-loader',
-            options: {
-              plugins: function () {
-                return [
-                  require('postcss-cssnext')
-                ];
-              }
-            }
-          }
+          'style-loader',
+          'css-loader',
+          'sass-loader',
         ]
-      }
+      },
     ]
   },
   resolve: {
-    extensions: ['.js', '.scss', '.css']
+    extensions: ['.js', '.scss', '.css', '.json']
   }
 };

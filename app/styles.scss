@@ -1,0 +1,17 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+.root {
+    font-weight: bold;
+}
+
+.mark {
+    padding: 3px;
+    &:hover {
+        background-color: #eee;
+        cursor: pointer;
+    }
+}
+
