@@ -1,6 +1,9 @@
 html, body {
     margin: 0;
     padding: 0;
+    font-family: Arial, sans;
+    background-color: #111;
+    color: #fff;
 }
 
 .root {
@@ -10,8 +13,19 @@ html, body {
 .mark {
     padding: 3px;
     &:hover {
-        background-color: #eee;
+        background-color: #333;
         cursor: pointer;
+    }
+}
+
+BUTTON {
+    background-color: #000;
+    color: #fff;
+    border: 2px solid #0099CC;
+    border-radius: 3px;
+    &:hover {
+        background-color: #0099CC;
+        color: #000;
     }
 }
 
