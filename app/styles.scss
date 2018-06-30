@@ -1,22 +1,49 @@
+$colour1: #edc7b7;
+$colour2: #eee2dc;
+$colour3: #bab2b5;
+$colour4: #123c69;
+$colour5: #ac3b61;
+
+$background: $colour2;
+$text-colour: $colour4;
+$group-colour: $colour5;
+$mark-colour: $colour3;
+$item-colour: $colour1;
+
 html, body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans;
-    background-color: #111;
-    color: #fff;
+    background-color: $background;
+    color: $text-colour;
 }
 
 .root {
     font-weight: bold;
 }
 
-.mark,.group {
-    padding: 10px;
-    .header {
-        &:hover {
-            background-color: #333;
-            cursor: pointer;
-        }
+.item {
+    padding: 5px 20px 5px 5px;
+    margin: 5px;
+    border-left: 5px solid $item-colour;
+}
+
+.mark {
+    padding: 5px 20px 5px 5px;
+    margin: 5px;
+    border-left: 5px solid $mark-colour;
+}
+
+.group {
+    padding: 5px 20px 5px 5px;
+    margin: 5px;
+    border-left: 5px solid $group-colour;
+}
+
+
+.header {
+    &:hover {
+        cursor: pointer;
     }
 }
 

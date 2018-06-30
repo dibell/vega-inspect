@@ -19,13 +19,11 @@ class Mark extends Component {
   }
   
   click(e) {
-    console.log('click', this);
     this.setState({ expanded: !this.state.expanded });
     e.preventDefault();
   }
 
   getDisplay(item, marktype) {
-    console.log('getDisplay', marktype);
     switch (marktype) {
       case 'text':
         return `(${item.x},${item.y}): ${item.text}`;
@@ -68,7 +66,7 @@ class Mark extends Component {
     const nSubItems = item.items ? item.items.length : 0;
     const display = this.getDisplay(item, marktype);
     return (
-      <div className="mark" onClick={this.click}>
+      <div className="item" onClick={this.click}>
         {index}: {display}
         {!!nSubItems &&
           <span>- {nSubItems} sub item(s)</span>
