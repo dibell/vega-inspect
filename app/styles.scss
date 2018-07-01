@@ -38,14 +38,50 @@ html, body {
     padding: 5px 20px 5px 5px;
     margin: 5px;
     border-left: 5px solid $group-colour;
+    position: relative;
+
+    .tooltiptext {
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s;
+
+        // width: 120px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        top: 0px;
+        padding: 3px 6px;
+        border-radius: 6px;
+        margin-left: 10px;
+
+        /* Position the tooltip text */
+        position: absolute;
+        z-index: 1;
+
+        &::after {
+            content: " ";
+            position: absolute;
+            top: 50%;
+            right: 100%;
+            margin-top: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: transparent #555 transparent transparent;
+        }
+    }
 }
 
 
 .header {
     &:hover {
         cursor: pointer;
+        .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
     }
 }
+
 
 BUTTON {
     background-color: #000;

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
+import { omit } from 'ramda';
 
 import './styles.scss';
 
@@ -67,7 +68,7 @@ class Mark extends Component {
     const display = this.getDisplay(item, marktype);
     return (
       <div className="item" onClick={this.click}>
-        {index}: {display}
+        {display}
         {!!nSubItems &&
           <span>- {nSubItems} sub item(s)</span>
         }
@@ -80,7 +81,7 @@ class Mark extends Component {
     return (
       <div className="mark">
         <div className="header" onClick={this.click}>
-          {index}: {mark.marktype}/{mark.role} - {nSubItems} sub item(s)
+          {mark.marktype}/{mark.role} - {nSubItems} sub item(s)
         </div>
 
         {this.state.expanded && nSubItems &&
@@ -93,13 +94,16 @@ class Mark extends Component {
   renderGroup(mark, index) {
     const rootItem = mark.items[0];
     const nSubItems = rootItem.items ? rootItem.items.length : 0;
+    console.log(mark);
+    const tip = JSON.stringify(omit(['items', 'marktype', 'name', 'role'], mark));
 
     return (
       <div className="group">
         <div className="header" onClick={this.click}>
-          {index} group: {mark.name}/{mark.role}&nbsp;
+          {mark.name}/{mark.role}&nbsp;
           {rootItem.width}x{rootItem.height}&nbsp;
           {nSubItems} sub item(s)
+          <span className="tooltiptext">{tip}</span>
         </div>
 
         {this.state.expanded && nSubItems &&
