@@ -66,8 +66,8 @@ class Mark extends Component {
         break;
       default:
         return {
-          header: JSON.stringify(item),
-          tip: ''
+          header: `(${item.x},${item.y}): (${item.width}x${item.height})`,
+          tip: JSON.stringify(omit(['x', 'y', 'width', 'height', 'items'], item))
         }
 
         // TODO
@@ -104,6 +104,10 @@ class Mark extends Component {
           {header}
           { tip && <span className="tooltiptext">{tip}</span>}
         </div>
+
+        {this.state.expanded && !!nSubItems &&
+          this.renderSubItems(item.items, index, item.marktype)
+        }
       </div>
     );
   }
@@ -116,71 +120,22 @@ class Mark extends Component {
     }
     const tip = JSON.stringify(omit(['items', 'marktype', 'name', 'role'], mark));
     return (
-      <div className="mark">
+      <div className={mark.marktype==='group'?'group':'mark'}>
         <div className="header" onClick={this.click}>
-          {mark.marktype}/{mark.role} - {nSubItems} sub item(s)
+          {header}
           <span className="tooltiptext">{tip}</span>
         </div>
 
-        {this.state.expanded && nSubItems &&
+        {this.state.expanded && !!nSubItems &&
           this.renderSubItems(mark.items, index, mark.marktype)
         }
       </div>
     );
   }
 
-  renderScope(mark, index) {
-    const rootItem = mark.items[0];
-    const nSubItems = rootItem.items ? rootItem.items.length : 0;
-    let header = `${mark.name || ''}/${mark.role}`;
-    if (!isNil(rootItem.width)) {
-      header = `${header} (${rootItem.width}x${rootItem.height})`;
-    }
-    if (!!nSubItems) {
-      header = `${header}: ${nSubItems} sub item(s)`
-    }
-    const tip = JSON.stringify(omit(['items', 'marktype', 'name', 'role'], mark));
-
-    return (
-      <div className="group">
-        <div className="header" onClick={this.click}>
-          {header}
-          <span className="tooltiptext">{tip}</span>
-        </div>
-
-        {this.state.expanded && nSubItems &&
-          this.renderSubItems(rootItem.items, index)
-        }
-      </div>
-    );
-  }
-
-  renderGroup(mark, index) {
-    if (mark.items.length === 1) {
-      return this.renderScope(mark, index);
-    } else {
-      let header = `${mark.name || ''}/${mark.role}`;
-      const tip = JSON.stringify(omit(['items', 'marktype', 'name', 'role'], mark));
-      return (<div className="group">
-          <div className="header" onClick={this.click}>
-            {header}
-            <span className="tooltiptext">{tip}</span>
-          </div>
-
-          {this.state.expanded &&
-            this.renderSubItems(mark.items, index, mark.marktype)
-          }
-      </div>);
-    }
-  }
-
   render() {
     const { mark, index, parent } = this.props;
-    console.log(mark, index, parent);
-    if (mark.marktype === 'group') {
-        return this.renderGroup(mark, index);
-    }
-    if (mark.marktype) {
+    if (!isNil(mark.marktype)) {
         return this.renderMark(mark, index);
     }
     return this.renderItem(mark, index, parent);
