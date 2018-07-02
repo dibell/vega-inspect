@@ -4,7 +4,12 @@ import { omit } from 'ramda';
 
 import './styles.scss';
 
-const scenegraph = require('./scenegraph.json');
+// const scenegraph = require('./scenegraph.json');
+
+//Create a port with background page for continous message communication
+var port = chrome.runtime.connect({ name: "vega-panel" });
+console.log('created port', port);
+
 
 const makeSubIndex = (index, subIndex) => 
   `${index}.${subIndex}`;
@@ -147,20 +152,33 @@ const validate = (scenegraph) => {
 
 class App extends Component {
   constructor(props) {
+    console.log('app constructor');
     super(props);
     this.click = this.click.bind(this);
+    this.receiveMessage = this.receiveMessage.bind(this);
     this.state = {};
   }
 
-  click() {
+  componentDidMount() {
+    console.log('componentDidMount adding listener');
+    // Listen to messages from the background page
+    port.onMessage.addListener(this.receiveMessage);
+  }
+      
+  receiveMessage(message) {
+    console.log('receiveMessage', message);
+    // port.postMessage(message);
+    const scenegraph = JSON.parse(message.content);
     validate(scenegraph);
     this.setState({scenegraph});
+  }
+
+  click() {
   }
 
   render() {
     return (
       <div>
-        <button onClick={this.click}>Load scenegraph</button>
         {!!this.state.scenegraph &&
           <Scenegraph scenegraph={this.state.scenegraph} />
         }

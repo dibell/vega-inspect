@@ -4,7 +4,8 @@
   "description": "Chrome devtools vega inspector",
   "private": "true",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack --progress",
+    "watch": "webpack --watch --progress"
   },
   "repository": {
     "type": "git",
@@ -21,6 +22,8 @@
     "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.7.0",
     "babel-preset-react": "^6.24.1",
+    "clean-webpack-plugin": "^0.1.19",
+    "copy-webpack-plugin": "^4.5.2",
     "css-loader": "^0.28.11",
     "node-sass": "^4.9.0",
     "ramda": "^0.25.0",

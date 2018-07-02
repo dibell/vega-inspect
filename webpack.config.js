@@ -1,4 +1,6 @@
 const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = {
   entry: [
@@ -29,5 +31,16 @@ module.exports = {
   },
   resolve: {
     extensions: ['.js', '.scss', '.css', '.json']
-  }
+  },
+  plugins: [
+    new CleanWebpackPlugin(['build']),
+    new CopyWebpackPlugin([ 
+      'extension/background.js',
+      'extension/contentscript.js',
+      'extension/devtools.html',
+      'extension/devtools.js',
+      'extension/manifest.json',
+      'extension/panel.html',
+    ], {}),
+  ]
 };
