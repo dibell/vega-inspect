@@ -8,7 +8,7 @@ const test_scenegraph = require('./scenegraph.json');
 
 //Create a port with background page for continous message communication
 let port;
-if (false) {
+if (!window.location.search || window.location.search !== '?test') {
   port = chrome.runtime.connect({ name: "vega-panel" });
   console.log('created port', port);
 }
@@ -37,19 +37,19 @@ class Mark extends Component {
       case 'text':
         return {
           header: `(${item.x},${item.y}): ${item.text}`,
-          tip: JSON.stringify(omit(['x', 'y', 'text'], mark))
+          tip: JSON.stringify(omit(['x', 'y', 'text'], item))
         }
         break;
       case 'rule':
         return {
           header: `(${item.x},${item.y}: ${item.x2},${item.y2})`,
-          tip: ''
+          tip: JSON.stringify(omit(['x', 'y', 'x2', 'y2'], item))
         }
         break;
       case 'rect':
         return {
           header: `(${item.x},${item.y}: ${item.x2},${item.y2}) (${item.width}x${item.height})`,
-          tip: ''
+          tip: JSON.stringify(omit(['x', 'y', 'x2', 'y2', 'width', 'height'], item))
         }
         break;
       default:
