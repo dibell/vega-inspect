@@ -32,19 +32,33 @@ class Mark extends Component {
     e.preventDefault();
   }
 
-  getDisplay(item, marktype) {
+  getItemDisplay(item, marktype) {
     switch (marktype) {
       case 'text':
-        return `(${item.x},${item.y}): ${item.text}`;
+        return {
+          header: `(${item.x},${item.y}): ${item.text}`,
+          tip: JSON.stringify(omit(['x', 'y', 'text'], mark))
+        }
         break;
       case 'rule':
-        return `(${item.x},${item.y}: ${item.x2},${item.y2})`;
+        return {
+          header: `(${item.x},${item.y}: ${item.x2},${item.y2})`,
+          tip: ''
+        }
         break;
       case 'rect':
-        return `(${item.x},${item.y}: ${item.x2},${item.y2}) (${item.width}x${item.height})`;
+        return {
+          header: `(${item.x},${item.y}: ${item.x2},${item.y2}) (${item.width}x${item.height})`,
+          tip: ''
+        }
         break;
       default:
-        return JSON.stringify(item);
+        return {
+          header: JSON.stringify(item),
+          tip: ''
+        }
+
+        // TODO
         // plotting symbols (symbol),
         // general paths or polygons (path),
         // circular arcs (arc),
@@ -73,23 +87,29 @@ class Mark extends Component {
 
   renderItem(item, index, marktype) {
     const nSubItems = item.items ? item.items.length : 0;
-    const display = this.getDisplay(item, marktype);
+    const { header, tip }= this.getItemDisplay(item, marktype);
     return (
-      <div className="item" onClick={this.click}>
-        {display}
-        {!!nSubItems &&
-          <span>- {nSubItems} sub item(s)</span>
-        }
+      <div className="item">
+        <div className="header" onClick={this.click}>
+          {header}
+          { tip && <span className="tooltiptext">{tip}</span>}
+        </div>
       </div>
     );
   }
 
   renderMark(mark, index) {
     const nSubItems = mark.items ? mark.items.length : 0;
+    let header = `${mark.name}/${mark.role}`;
+    if (!!nSubItems) {
+      header = `${header}: ${nSubItems} sub item(s)`
+    }
+    const tip = JSON.stringify(omit(['items', 'marktype', 'name', 'role'], mark));
     return (
       <div className="mark">
         <div className="header" onClick={this.click}>
           {mark.marktype}/{mark.role} - {nSubItems} sub item(s)
+          <span className="tooltiptext">{tip}</span>
         </div>
 
         {this.state.expanded && nSubItems &&
@@ -102,15 +122,19 @@ class Mark extends Component {
   renderGroup(mark, index) {
     const rootItem = mark.items[0];
     const nSubItems = rootItem.items ? rootItem.items.length : 0;
-    console.log(mark);
+    let header = `${mark.name || ''}/${mark.role}`;
+    if (rootItem.width) {
+      header = `${header} (${rootItem.width}x${rootItem.height})`;
+    }
+    if (!!nSubItems) {
+      header = `${header}: ${nSubItems} sub item(s)`
+    }
     const tip = JSON.stringify(omit(['items', 'marktype', 'name', 'role'], mark));
 
     return (
       <div className="group">
         <div className="header" onClick={this.click}>
-          {mark.name}/{mark.role}&nbsp;
-          {rootItem.width}x{rootItem.height}&nbsp;
-          {nSubItems} sub item(s)
+          {header}
           <span className="tooltiptext">{tip}</span>
         </div>
 
