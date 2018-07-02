@@ -32,44 +32,44 @@ class Mark extends Component {
     e.preventDefault();
   }
 
-  getItemDisplay(item, marktype) {
-    switch (marktype) {
-      case 'text':
-        return {
-          header: `(${item.x},${item.y}): ${item.text}`,
-          tip: JSON.stringify(omit(['x', 'y', 'text'], item))
-        }
-        break;
-      case 'rule':
-        return {
-          header: `(${item.x},${item.y}): (${item.x2},${item.y2})`,
-          tip: JSON.stringify(omit(['x', 'y', 'x2', 'y2'], item))
-        }
-        break;
-      case 'rect':
-        return {
-          header: `(${item.x},${item.y}): (${item.x2},${item.y2}) (${item.width}x${item.height})`,
-          tip: JSON.stringify(omit(['x', 'y', 'x2', 'y2', 'width', 'height'], item))
-        }
-        break;
-      case 'arc':
-        return {
-          header: `(${item.x},${item.y}): ${item.startAngle} to ${item.endAngle} r=${item.outerRadius})`,
-          tip: JSON.stringify(omit(['x', 'y', 'startAngle', 'endAngle', 'outerRadius'], item))
-        }
-        break;
-      case 'symbol':
-        return {
-          header: `(${item.x},${item.y}): size=${item.size} ${item.shape})`,
-          tip: JSON.stringify(omit(['x', 'y', 'size', 'shape'], item))
-        }
-        break;
-      default:
-        return {
-          header: `(${item.x},${item.y}): (${item.width}x${item.height})`,
-          tip: JSON.stringify(omit(['x', 'y', 'width', 'height', 'items'], item))
-        }
-
+  getItemDisplay(item, parentType) {
+    if (!item.marktype) {
+      switch (parentType) {
+        case 'text':
+          return {
+            header: `(${item.x},${item.y}): ${item.text}`,
+            tip: JSON.stringify(omit(['x', 'y', 'text'], item))
+          }
+          break;
+        case 'rule':
+          return {
+            header: `(${item.x},${item.y}): (${item.x2},${item.y2})`,
+            tip: JSON.stringify(omit(['x', 'y', 'x2', 'y2'], item))
+          }
+          break;
+        case 'rect':
+          return {
+            header: `(${item.x},${item.y}): (${item.x2},${item.y2}) (${item.width}x${item.height})`,
+            tip: JSON.stringify(omit(['x', 'y', 'x2', 'y2', 'width', 'height'], item))
+          }
+          break;
+        case 'arc':
+          return {
+            header: `(${item.x},${item.y}): ${item.startAngle} to ${item.endAngle} r=${item.outerRadius})`,
+            tip: JSON.stringify(omit(['x', 'y', 'startAngle', 'endAngle', 'outerRadius'], item))
+          }
+          break;
+        case 'symbol':
+          return {
+            header: `(${item.x},${item.y}): size=${item.size} ${item.shape})`,
+            tip: JSON.stringify(omit(['x', 'y', 'size', 'shape'], item))
+          }
+          break;
+        default:
+          return {
+            header: `(${item.x},${item.y}): (${item.width}x${item.height})`,
+            tip: JSON.stringify(omit(['x', 'y', 'width', 'height', 'items'], item))
+          }
         // TODO
         // general paths or polygons (path),
         // filled areas (area),
@@ -78,7 +78,14 @@ class Mark extends Component {
         // shape
         // trail
         // area
+      }
     }
+
+    return {
+      header: `${item.marktype}/${item.role}`,
+      tip: JSON.stringify(omit(['role', 'items', 'marktype'], item))
+    }
+
   }
 
   renderSubItems(items, index, marktype) {
@@ -88,39 +95,27 @@ class Mark extends Component {
         <Mark key={makeSubIndex(index, subIndex)}
           mark={item}
           index={makeSubIndex(index, subIndex)}
-          parent={marktype}
+          parentType={marktype}
         />
         )}
       </div>
     );
   }
 
-  renderItem(item, index, marktype) {
-    const nSubItems = item.items ? item.items.length : 0;
-    const { header, tip }= this.getItemDisplay(item, marktype);
-    return (
-      <div className="item">
-        <div className="header" onClick={this.click}>
-          {header}
-          { tip && <span className="tooltiptext">{tip}</span>}
-        </div>
-
-        {this.state.expanded && !!nSubItems &&
-          this.renderSubItems(item.items, index, item.marktype)
-        }
-      </div>
-    );
-  }
-
-  renderMark(mark, index) {
+  render() {
+    const { mark, index, parentType } = this.props;
     const nSubItems = mark.items ? mark.items.length : 0;
-    let header = `${mark.name}/${mark.role}`;
+    let { header, tip }= this.getItemDisplay(mark, parentType);
     if (!!nSubItems) {
-      header = `${header}: ${nSubItems} sub item(s)`
+      header = `${header}: ${nSubItems} sub ${nSubItems===1? 'item': 'items'}`;
     }
-    const tip = JSON.stringify(omit(['items', 'marktype', 'name', 'role'], mark));
+
+    const className = 
+      mark.marktype==='group' ? 'group'
+      : !isNil(mark.marktype) ? 'mark' : 'item';
+
     return (
-      <div className={mark.marktype==='group'?'group':'mark'}>
+      <div className={className}>
         <div className="header" onClick={this.click}>
           {header}
           <span className="tooltiptext">{tip}</span>
@@ -131,14 +126,6 @@ class Mark extends Component {
         }
       </div>
     );
-  }
-
-  render() {
-    const { mark, index, parent } = this.props;
-    if (!isNil(mark.marktype)) {
-        return this.renderMark(mark, index);
-    }
-    return this.renderItem(mark, index, parent);
   }
 };
 
@@ -164,7 +151,6 @@ const validate = (scenegraph) => {
 
 class App extends Component {
   constructor(props) {
-    console.log('app constructor');
     super(props);
     this.click = this.click.bind(this);
     this.receiveMessage = this.receiveMessage.bind(this);
@@ -175,7 +161,6 @@ class App extends Component {
     // Listen to messages from the background page
     if (port) {
       port.onMessage.addListener(this.receiveMessage);
-      console.log('listener added');
     }
 
     if (window.location.search && window.location.search === '?test') {
@@ -184,7 +169,6 @@ class App extends Component {
   }
       
   receiveMessage(message) {
-    console.log('receiveMessage', message);
     // port.postMessage(message);
     const scenegraph = JSON.parse(message.content);
     validate(scenegraph);
