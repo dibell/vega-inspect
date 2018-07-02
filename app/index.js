@@ -4,11 +4,14 @@ import { omit } from 'ramda';
 
 import './styles.scss';
 
-// const scenegraph = require('./scenegraph.json');
+const test_scenegraph = require('./scenegraph.json');
 
 //Create a port with background page for continous message communication
-var port = chrome.runtime.connect({ name: "vega-panel" });
-console.log('created port', port);
+let port;
+if (false) {
+  port = chrome.runtime.connect({ name: "vega-panel" });
+  console.log('created port', port);
+}
 
 
 const makeSubIndex = (index, subIndex) => 
@@ -160,9 +163,15 @@ class App extends Component {
   }
 
   componentDidMount() {
-    console.log('componentDidMount adding listener');
     // Listen to messages from the background page
-    port.onMessage.addListener(this.receiveMessage);
+    if (port) {
+      port.onMessage.addListener(this.receiveMessage);
+      console.log('listener added');
+    }
+
+    if (window.location.search && window.location.search === '?test') {
+      this.setState({scenegraph: test_scenegraph})
+    }
   }
       
   receiveMessage(message) {
