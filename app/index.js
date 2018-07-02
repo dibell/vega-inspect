@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
-import { omit } from 'ramda';
+import { omit, isNil } from 'ramda';
 
 import './styles.scss';
 
@@ -42,14 +42,26 @@ class Mark extends Component {
         break;
       case 'rule':
         return {
-          header: `(${item.x},${item.y}: ${item.x2},${item.y2})`,
+          header: `(${item.x},${item.y}): (${item.x2},${item.y2})`,
           tip: JSON.stringify(omit(['x', 'y', 'x2', 'y2'], item))
         }
         break;
       case 'rect':
         return {
-          header: `(${item.x},${item.y}: ${item.x2},${item.y2}) (${item.width}x${item.height})`,
+          header: `(${item.x},${item.y}): (${item.x2},${item.y2}) (${item.width}x${item.height})`,
           tip: JSON.stringify(omit(['x', 'y', 'x2', 'y2', 'width', 'height'], item))
+        }
+        break;
+      case 'arc':
+        return {
+          header: `(${item.x},${item.y}): ${item.startAngle} to ${item.endAngle} r=${item.outerRadius})`,
+          tip: JSON.stringify(omit(['x', 'y', 'startAngle', 'endAngle', 'outerRadius'], item))
+        }
+        break;
+      case 'symbol':
+        return {
+          header: `(${item.x},${item.y}): size=${item.size} ${item.shape})`,
+          tip: JSON.stringify(omit(['x', 'y', 'size', 'shape'], item))
         }
         break;
       default:
@@ -59,9 +71,7 @@ class Mark extends Component {
         }
 
         // TODO
-        // plotting symbols (symbol),
         // general paths or polygons (path),
-        // circular arcs (arc),
         // filled areas (area),
         // lines (line),
         // images (image),
@@ -119,11 +129,11 @@ class Mark extends Component {
     );
   }
 
-  renderGroup(mark, index) {
+  renderScope(mark, index) {
     const rootItem = mark.items[0];
     const nSubItems = rootItem.items ? rootItem.items.length : 0;
     let header = `${mark.name || ''}/${mark.role}`;
-    if (rootItem.width) {
+    if (!isNil(rootItem.width)) {
       header = `${header} (${rootItem.width}x${rootItem.height})`;
     }
     if (!!nSubItems) {
@@ -145,8 +155,28 @@ class Mark extends Component {
     );
   }
 
+  renderGroup(mark, index) {
+    if (mark.items.length === 1) {
+      return this.renderScope(mark, index);
+    } else {
+      let header = `${mark.name || ''}/${mark.role}`;
+      const tip = JSON.stringify(omit(['items', 'marktype', 'name', 'role'], mark));
+      return (<div className="group">
+          <div className="header" onClick={this.click}>
+            {header}
+            <span className="tooltiptext">{tip}</span>
+          </div>
+
+          {this.state.expanded &&
+            this.renderSubItems(mark.items, index, mark.marktype)
+          }
+      </div>);
+    }
+  }
+
   render() {
     const { mark, index, parent } = this.props;
+    console.log(mark, index, parent);
     if (mark.marktype === 'group') {
         return this.renderGroup(mark, index);
     }
